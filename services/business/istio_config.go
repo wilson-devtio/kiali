@@ -5,7 +5,9 @@ import (
 	"sync"
 
 	"github.com/kiali/kiali/kubernetes"
+	"github.com/kiali/kiali/log"
 	"github.com/kiali/kiali/services/models"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type IstioConfigService struct {
@@ -19,6 +21,37 @@ type IstioConfigCriteria struct {
 	IncludeVirtualServices     bool
 	IncludeDestinationRules    bool
 	IncludeRules               bool
+}
+
+// SwitchRoute test
+func (in *IstioConfigService) SwitchRoute(criteria IstioConfigCriteria) (string, error) {
+	result := "Error"
+	routeRule := (&kubernetes.RouteRule{
+		ObjectMeta: meta_v1.ObjectMeta{
+			Name: "reviews",
+		},
+		Spec: map[string]interface{}{
+			"precedence": uint64(1),
+		},
+	}).DeepCopyIstioObject()
+
+	var rrErr error
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if _, rrErr := in.k8s.CreateRouteRule(criteria.Namespace, routeRule); rrErr == nil {
+			result = "Success"
+			log.Error(rrErr)
+		}
+	}()
+	wg.Wait()
+	log.Error(rrErr)
+	if rrErr != nil {
+		log.Error(rrErr)
+		return result, rrErr
+	}
+	return result, nil
 }
 
 // GetIstioConfig returns a list of Istio routing objects (RouteRule, DestinationPolicy, VirtualService, DestinationRule)

@@ -2,8 +2,10 @@ package kubernetes
 
 import (
 	"fmt"
-	"github.com/kiali/kiali/config"
 	"sync"
+
+	"github.com/kiali/kiali/config"
+	"github.com/kiali/kiali/log"
 )
 
 // GetIstioDetails returns Istio details for a given namespace,
@@ -61,6 +63,23 @@ func (in *IstioClient) GetIstioDetails(namespace string, serviceName string) (*I
 	}
 
 	return &istioDetails, nil
+}
+
+// CreateRouteRule creates a route rule
+func (in *IstioClient) CreateRouteRule(namespace string, routeRuleToBeCreated IstioObject) (IstioObject, error) {
+	log.Error(namespace)
+	result, err := in.istioConfigApi.Post().Namespace(namespace).Resource(routeRules).Body(routeRuleToBeCreated).Do().Get()
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	log.Error("called namespace and no error")
+	routeRule, ok := result.(*RouteRule)
+	if !ok {
+		log.Error("no route rule object returned")
+		return nil, fmt.Errorf("%s doesn't return a RouteRule object", namespace)
+	}
+	return routeRule.DeepCopyIstioObject(), nil
 }
 
 // GetRouteRules returns all RouteRules for a given namespace.

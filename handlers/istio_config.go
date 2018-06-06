@@ -11,6 +11,38 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 )
 
+// SwitchRoute method
+func SwitchRoute(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	namespace := params["namespace"]
+	query := r.URL.Query()
+	objects := ""
+	if _, ok := query["objects"]; ok {
+		objects = strings.ToLower(query.Get("objects"))
+	}
+	criteria := parseCriteria(namespace, objects)
+
+	// Get business layer
+	business, err := business.Get()
+	if err != nil {
+		RespondWithError(w, http.StatusInternalServerError, "Services initialization error: "+err.Error())
+		return
+	}
+
+	res, err := business.IstioConfig.SwitchRoute(criteria)
+	log.Error(err)
+	log.Error(res)
+
+	if err != nil {
+		log.Error(err)
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	RespondWithJSON(w, http.StatusOK, res)
+}
+
+// IstioConfigList method
 func IstioConfigList(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	namespace := params["namespace"]

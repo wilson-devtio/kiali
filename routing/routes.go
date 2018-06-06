@@ -36,6 +36,12 @@ func NewRoutes() (r *Routes) {
 			"/api/token",
 			handlers.GetToken,
 		},
+		{ // Test API to route switch
+			"Status",
+			"GET",
+			"/api/namespaces/{namespace}/switch",
+			handlers.SwitchRoute,
+		},
 		{ // another way to get to root, both show status
 			"Status",
 			"GET",

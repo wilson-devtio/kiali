@@ -35,7 +35,7 @@ GO_VERSION_KIALI = 1.8.3
 # Note that if building from a non-master branch, the default
 # version will be the same name as the branch allowing you to
 # deploy different builds at the same time.
-DOCKER_NAME ?= kiali/kiali
+DOCKER_NAME ?= gcr.io/innate-lacing-206112/kiali
 ifeq  ("${VERSION_LABEL}","master")
   DOCKER_VERSION ?= dev
 else

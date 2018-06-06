@@ -44,6 +44,7 @@ type IstioClientInterface interface {
 	GetIstioDetails(namespace string, serviceName string) (*IstioDetails, error)
 	GetRouteRules(namespace string, serviceName string) ([]IstioObject, error)
 	GetRouteRule(namespace string, routerule string) (IstioObject, error)
+	CreateRouteRule(namespace string, routerule IstioObject) (IstioObject, error)
 	GetDestinationPolicies(namespace string, serviceName string) ([]IstioObject, error)
 	GetDestinationPolicy(namespace string, destinationpolicy string) (IstioObject, error)
 	GetVirtualServices(namespace string, serviceName string) ([]IstioObject, error)
