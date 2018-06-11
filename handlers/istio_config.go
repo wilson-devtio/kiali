@@ -30,8 +30,6 @@ func SwitchRoute(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res, err := business.IstioConfig.SwitchRoute(criteria)
-	log.Error(err)
-	log.Error(res)
 
 	if err != nil {
 		log.Error(err)
